@@ -45,6 +45,7 @@ def get_matches(html_doc):
     for i in range(matchno):
         team2s.append(teams[2*i+1])
 
+    match_data.append(['Date', 'Series', 'Status', 'Team', 'Score', 'Team'])
     for i in range(len(team1s)):
         match_data.append([dates[i], series[i], statuses[i], team1s[i], scores[i], team2s[i]])
 
@@ -53,7 +54,7 @@ def get_matches(html_doc):
 
 def print_matches(matches_data):
     table = AsciiTable(matches_data)
-    table.inner_heading_row_border = False
+    table.inner_heading_row_border = True
     table.inner_row_border = False
     print (table.table)
 
