@@ -33,9 +33,17 @@ def get_matches(html_doc):
         for y in series_soup:
             indi_matches_soup = y.findAll('tbody', class_='match')
             for z in indi_matches_soup:
-                series.append(y.find('span', class_='comp-title').text.strip())
+                if (len(series)>0 and y.find('span', class_='comp-title').text.strip() == last_series):
+                    series.append('')
+                else:
+                    series.append(y.find('span', class_='comp-title').text.strip())
+                    last_series=y.find('span', class_='comp-title').text.strip()
                 date = re.sub(r'.*day\ ', '', x.h3.text.strip())
-                dates.append(date)
+                if (len(dates)>0 and date == last_date):
+                    dates.append('')
+                else:
+                    dates.append(date)
+                    last_date=date
                 statuses.append(z.find('td', class_='status').text.strip())
                 scores.append(z.find('td', class_='vs').text.strip())
                 for k in z.findAll('td', class_='team'):
