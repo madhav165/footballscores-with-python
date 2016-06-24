@@ -3,6 +3,7 @@
 import urllib.request
 from bs4 import BeautifulSoup
 from terminaltables import AsciiTable
+import re
 
 global URL
 
@@ -33,7 +34,8 @@ def get_matches(html_doc):
             indi_matches_soup = y.findAll('tbody', class_='match')
             for z in indi_matches_soup:
                 series.append(y.find('span', class_='comp-title').text.strip())
-                dates.append(x.h3.text.strip())
+                date = re.sub(r'.*day\ ', '', x.h3.text.strip())
+                dates.append(date)
                 statuses.append(z.find('td', class_='status').text.strip())
                 scores.append(z.find('td', class_='vs').text.strip())
                 for k in z.findAll('td', class_='team'):
