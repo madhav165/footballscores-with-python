@@ -10,6 +10,7 @@ global URL
 def set_url():
     global URL
     URL = "http://www.goal.com/en-india/live-scores"
+    #URL = "http://www.goal.com/en-india/results"
 
 def get_html():
     with urllib.request.urlopen(URL) as response:
