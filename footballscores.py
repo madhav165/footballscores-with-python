@@ -17,37 +17,38 @@ def get_html():
 def get_matches(html_doc):
     soup = BeautifulSoup(html_doc, 'lxml')
     
-    vs_soup=soup.find_all('td', class_='vs')
-    scores = []
-    for x in vs_soup:
-        scores.append(x.div.string.strip())
-
-    statuses_soup=soup.find_all('td', class_='status')
+    matches_soup = soup.findAll('section', class_='matchday')
+    matches_soup = matches_soup[3:]
+    dates = []
+    series = []
     statuses = []
-    for x in statuses_soup:
-        statuses.append(x.span.string.strip())
-
-    teams_soup=soup.find_all('div', class_='module-team')
     teams = []
-    for x in teams_soup:
-        teams.append(x.span.string.strip())
-
-    matchno = int(len(teams)/2)
-
+    scores = []
     team1s = []
+    team2s = []
+    match_data = []
+    for x in matches_soup:
+        series_soup = x.findAll('table', class_='matches')
+        for y in series_soup:
+            indi_matches_soup = y.findAll('tbody', class_='match')
+            for z in indi_matches_soup:
+                series.append(y.find('span', class_='comp-title').text.strip())
+                dates.append(x.h3.text.strip())
+                statuses.append(z.find('td', class_='status').text.strip())
+                scores.append(z.find('td', class_='vs').text.strip())
+                for k in z.findAll('td', class_='team'):
+                    teams.append(k.text.strip())
+    
+    matchno = int(len(teams)/2)
     for i in range(matchno):
         team1s.append(teams[2*i])
-
-    team2s = []
     for i in range(matchno):
         team2s.append(teams[2*i+1])
 
-    matches_data=[]
-    for i in range(matchno):
-        match_data=[statuses[i],team1s[i],scores[i],team2s[i]]
-        matches_data.append(match_data)
+    for i in range(len(team1s)):
+        match_data.append([dates[i], series[i], statuses[i], team1s[i], scores[i], team2s[i]])
 
-    return matches_data
+    return match_data
 
 
 def print_matches(matches_data):
@@ -59,4 +60,5 @@ def print_matches(matches_data):
 set_url()
 html_doc = get_html()
 matches_data = get_matches(html_doc)
+#get_matches(html_doc)
 print_matches(matches_data)
