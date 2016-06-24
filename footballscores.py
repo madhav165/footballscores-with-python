@@ -2,7 +2,7 @@
 
 import urllib.request
 from bs4 import BeautifulSoup
-import time
+from terminaltables import AsciiTable
 
 global URL
 
@@ -16,53 +16,47 @@ def get_html():
 
 def get_matches(html_doc):
     soup = BeautifulSoup(html_doc, 'lxml')
-
-    matches_soup=soup.find_all('div', class_='qmatch-info')
-    innings_info_1_soup=soup.find_all('div', class_='innings-info-1')
-    innings_info_2_soup=soup.find_all('div', class_='innings-info-2')
-    match_status_soup=soup.find_all('div', class_='match-status')
-
-    dates = []
-    stadiums = []
-    team1s = []
-    score1s = []
-    team2s = []
-    score2s = []
-    match_statuses = []
-
-    for x in match_info_soup:
-        dates.append(x.find('span', class_='bold').string.strip())
-        stadiums.append(x.find('span', class_='match-no').a.string.strip())
     
-    for x in innings_info_1_soup:
-        team1s.append(x.find(text=True).strip())
-        if str(x.span.string).strip() != 'None':
-            score1s.append(str(x.span.string).strip())
-        else:
-            score1s.append("")
+    vs_soup=soup.find_all('td', class_='vs')
+    scores = []
+    for x in vs_soup:
+        scores.append(x.div.string.strip())
 
-    for x in innings_info_2_soup:
-        team2s.append(x.find(text=True).strip())
-        if str(x.span.string).strip() != 'None':
-            score2s.append(str(x.span.string).strip())
-        else:
-            score2s.append("")
+    statuses_soup=soup.find_all('td', class_='status')
+    statuses = []
+    for x in statuses_soup:
+        statuses.append(x.span.string.strip())
 
-    for x in match_status_soup:
-        match_statuses.append(str(x.span.string).strip())
-    matches = zip(dates, stadiums, team1s, score1s, team2s, score2s, match_statuses)
-    return matches
+    teams_soup=soup.find_all('div', class_='module-team')
+    teams = []
+    for x in teams_soup:
+        teams.append(x.span.string.strip())
 
-def print_matches(matches):
-    print()
-    print ('%-45s %-10s %-45s %0s' % ("-----------------------------------------", "SCORES", "-----------------------------------------", "\n\n"))
-    for x in matches:
-        print ('%-30s %-20s %-30s %-20s %0s' % (str(x[2]), str(x[3]), str(x[4]), str(x[5]), "\n\n"))
+    matchno = int(len(teams)/2)
 
-#t1 = time.time();
+    team1s = []
+    for i in range(matchno):
+        team1s.append(teams[2*i])
+
+    team2s = []
+    for i in range(matchno):
+        team2s.append(teams[2*i+1])
+
+    matches_data=[]
+    for i in range(matchno):
+        match_data=[statuses[i],team1s[i],scores[i],team2s[i]]
+        matches_data.append(match_data)
+
+    return matches_data
+
+
+def print_matches(matches_data):
+    table = AsciiTable(matches_data)
+    table.inner_heading_row_border = False
+    table.inner_row_border = False
+    print (table.table)
+
 set_url()
 html_doc = get_html()
-matches = get_matches(html_doc)
-print_matches(matches)
-#t2 = time.time();
-#print ('Retreived in %.f milliseconds' % (1000*(t2-t1)))
+matches_data = get_matches(html_doc)
+print_matches(matches_data)
