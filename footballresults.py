@@ -36,16 +36,21 @@ def get_matches(html_doc):
                 series.append(series_name)
                 last_series = series_name
             statuses.append(y.find('td', class_='status').text.strip())
-            main_score = y.find('td', class_='vs').div.text.strip()
-            if(statuses[-1]=='PEN'):
-                pen_score=x.find('tr',class_='score-details').td.text.strip()
-                pen_score=re.sub('[a-zA-Z]','',pen_score).strip()
-                scores.append(main_score+' ('+pen_score+')')
-            else:
-                scores.append(main_score)
             teams_soup=y.findAll('div', class_='module-team')
             for z in teams_soup:
                 teams.append(z.span.text.strip())
+            main_score = y.find('td', class_='vs').div.text.strip()
+            if(statuses[-1]=='PEN'):
+                pen_score=x.find('tr',class_='score-details').td.text.strip()
+                winning_team = pen_score.split()[0].strip()
+                pen_score=re.sub('[a-zA-Z]','',pen_score).strip()
+                if (winning_team is teams[-2]):
+                    scores.append(main_score+' ('+pen_score+')')
+                else:
+                    scores.append(main_score+' ('+pen_score[::-1]+')')
+            else:
+                scores.append(main_score)
+
 
     matchno = int(len(teams)/2)
     for i in range(matchno):

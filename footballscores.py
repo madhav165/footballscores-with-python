@@ -10,7 +10,6 @@ global URL
 def set_url():
     global URL
     URL = "http://www.goal.com/en-india/live-scores"
-    #URL = "http://www.goal.com/en-india/results"
 
 def get_html():
     with urllib.request.urlopen(URL) as response:
@@ -46,9 +45,21 @@ def get_matches(html_doc):
                     dates.append(date)
                     last_date=date
                 statuses.append(z.find('td', class_='status').text.strip())
-                scores.append(z.find('td', class_='vs').text.strip())
                 for k in z.findAll('td', class_='team'):
                     teams.append(k.text.strip())
+                main_score = z.find('td', class_='vs').div.text.strip()
+                if(statuses[-1]=='PEN'):
+                    pen_score=z.find('tr',class_='score-details').td.text.strip()
+                    winning_team = pen_score.split()[0].strip()
+                    pen_score=re.sub('[a-zA-Z]','',pen_score).strip()
+                    if (winning_team is teams[-2]):
+                        scores.append(main_score+' ('+pen_score+')')
+                    else:
+                        scores.append(main_score+' ('+pen_score[::-1]+')')
+                else:
+                    scores.append(main_score)
+                #scores.append(z.find('td', class_='vs').text.strip())
+
     
     matchno = int(len(teams)/2)
     for i in range(matchno):
