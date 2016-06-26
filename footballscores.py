@@ -4,6 +4,7 @@ import urllib.request
 from bs4 import BeautifulSoup
 from terminaltables import AsciiTable
 import re
+import pydoc
 
 global URL
 
@@ -78,7 +79,7 @@ def print_matches(matches_data):
     table = AsciiTable(matches_data)
     table.inner_heading_row_border = True
     table.inner_row_border = False
-    print (table.table)
+    pydoc.pager (table.table)
 
 set_url()
 html_doc = get_html()
